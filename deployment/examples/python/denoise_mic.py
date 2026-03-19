@@ -48,12 +48,12 @@ def parse_args() -> argparse.Namespace:
         help="List audio devices and exit",
     )
     parser.add_argument(
-        "--save-input", default=None, metavar="PATH",
-        help="Save raw microphone input to a WAV file",
+        "--save-input", default="mic_raw.wav", metavar="PATH",
+        help="Save raw microphone input to a WAV file (default: mic_raw.wav)",
     )
     parser.add_argument(
-        "--save-output", default=None, metavar="PATH",
-        help="Save denoised output to a WAV file",
+        "--save-output", default="mic_denoised.wav", metavar="PATH",
+        help="Save denoised output to a WAV file (default: mic_denoised.wav)",
     )
     return parser.parse_args()
 
@@ -105,9 +105,9 @@ def main() -> None:
     sr = nc.sample_rate
     passthrough = args.passthrough
 
-    # Recording buffers (collect frames, write to disk on exit)
-    rec_input: list[np.ndarray] = [] if args.save_input else None
-    rec_output: list[np.ndarray] = [] if args.save_output else None
+    # Recording buffers (always collect frames, write to disk on exit)
+    rec_input: list[np.ndarray] = []
+    rec_output: list[np.ndarray] = []
 
     # SNR tracking
     snr_accum: list[float] = []
@@ -115,7 +115,6 @@ def main() -> None:
 
     def callback(
         indata: np.ndarray,
-        outdata: np.ndarray,
         frames: int,
         time_info: object,
         status: object,
@@ -129,18 +128,16 @@ def main() -> None:
         frame_in = indata[:, 0].copy()
 
         if passthrough:
-            outdata[:, 0] = frame_in
+            frame_out = frame_in.copy()
         else:
-            outdata[:, 0] = nc.process_frame(frame_in)
+            frame_out = nc.process_frame(frame_in)
 
-        if rec_input is not None:
-            rec_input.append(frame_in.copy())
-        if rec_output is not None:
-            rec_output.append(outdata[:, 0].copy())
+        rec_input.append(frame_in.copy())
+        rec_output.append(frame_out.copy())
 
         # Simple SNR estimate: ratio of output power to (input - output) power
-        sig_power = np.mean(outdata[:, 0] ** 2)
-        noise_power = np.mean((frame_in - outdata[:, 0]) ** 2)
+        sig_power = np.mean(frame_out ** 2)
+        noise_power = np.mean((frame_in - frame_out) ** 2)
         if noise_power > 1e-10:
             snr_db = 10 * np.log10(sig_power / noise_power + 1e-10)
             snr_accum.append(snr_db)
@@ -153,16 +150,14 @@ def main() -> None:
             last_print = now
 
     mode = "PASSTHROUGH" if passthrough else "DENOISING"
-    print(f"Microphone demo — {mode} mode")
+    print(f"Microphone recording — {mode} mode (no playback)")
     print(f"  Sample rate: {sr} Hz | Frame: {frame_len} samples ({frame_len / sr * 1000:.0f} ms)")
-    if args.save_input:
-        print(f"  Recording input  -> {args.save_input}")
-    if args.save_output:
-        print(f"  Recording output -> {args.save_output}")
+    print(f"  Raw input   -> {args.save_input}")
+    print(f"  Denoised    -> {args.save_output}")
     print("  Press Ctrl+C to stop.\n")
 
     try:
-        with sd.Stream(
+        with sd.InputStream(
             samplerate=sr,
             blocksize=frame_len,
             channels=1,
