@@ -1,4 +1,4 @@
-# DeepFilterNet-SE
+# Hush
 
 **The first open-source speech enhancement model built specifically for Voice AI — with real-time background speaker suppression.**
 
