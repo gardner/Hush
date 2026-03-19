@@ -4,6 +4,8 @@
 
 > **8 MB model · Runs fully on CPU in real time · Trained on 10,000+ hours of mixed audio · Under 1 ms processing per 10 ms of audio**
 
+> 🚀 **Coming Soon:** We are currently fine-tuning a new model optimized specifically for environments with even **louder background noise and louder background speech**! Stay tuned for the upcoming release.
+
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://python.org)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-orange.svg)](https://pytorch.org)
