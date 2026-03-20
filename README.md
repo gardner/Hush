@@ -13,6 +13,18 @@
 
 ---
 
+## Listen to the Model (Use headphones)
+
+**Raw Audio (Noisy Environment):**
+
+<video controls src="https://github.com/pulp-vision/Hush/raw/main/assets/audio/sample_00006_raw.wav" title="Raw Audio"></video>
+
+**Denoised Audio (Hush Output):**
+
+<video controls src="https://github.com/pulp-vision/Hush/raw/main/assets/audio/sample_00006_denoised.wav" title="Denoised Audio"></video>
+
+---
+
 ## Built for Voice AI
 
 Hush is designed from the ground up for **Voice AI applications** — phone-based voice agents, call centre bots, voice assistants, real-time transcription pipelines, and conversational AI systems. These systems have a fundamentally different requirement from generic noise cancellation: they must isolate exactly one speaker from a live audio stream, in real time, under production conditions — from callers phoning in from traffic, kitchens, crowded restaurants, and places full of background talkers.
