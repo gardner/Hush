@@ -15,13 +15,9 @@
 
 ## Listen to the Model (Use headphones)
 
-**Raw Audio (Noisy Environment):**
+[![Listen to Audio Demo](https://img.shields.io/badge/Listen%20to%20Demo-%E2%96%B6%20Play%20Audio-blue?style=for-the-badge)](https://pulp-vision.github.io/Hush/audio-demo.html)
 
-<video src="https://github.com/pulp-vision/Hush/releases/download/v1.0.0/sample_00006_raw.mp4" controls width="640"></video>
-
-**Denoised Audio (Hush Output):**
-
-<video src="https://github.com/pulp-vision/Hush/releases/download/v1.0.0/sample_00006_denoised.mp4" controls width="640"></video>
+Click the button above to open the interactive audio demo — play the raw noisy sample and the Hush-enhanced output side by side.
 
 ---
 
