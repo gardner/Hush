@@ -16,7 +16,6 @@ venv/
 # PyTorch checkpoints and model weights
 *.pt
 *.pth
-*.ckpt
 *.pkl
 
 # Data files (HDF5)
