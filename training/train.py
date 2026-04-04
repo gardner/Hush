@@ -1100,8 +1100,15 @@ def main():
     if args.enable_pesq and not HAS_PESQ:
         print("Warning: pesq not installed; PESQ metric will be skipped.")
 
-    # Device
-    device = torch.device(config.device if torch.cuda.is_available() else "cpu")
+    # Device: prefer configured device, auto-detect CUDA > MPS > CPU
+    if config.device and config.device != "auto":
+        device = torch.device(config.device)
+    elif torch.cuda.is_available():
+        device = torch.device("cuda")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+    else:
+        device = torch.device("cpu")
     print(f"Device: {device}")
 
     # Seed
@@ -1142,7 +1149,7 @@ def main():
         batch_size=tc.batch_size,
         batch_size_eval=bs_eval,
         num_workers=tc.num_workers,
-        pin_memory=device.type == "cuda",
+        pin_memory=device.type in ("cuda", "mps"),
         max_len_s=tc.max_sample_len_s,
         fft_size=dc.fft_size,
         hop_size=dc.hop_size,

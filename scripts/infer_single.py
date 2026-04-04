@@ -55,7 +55,7 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--device",
-        choices=["cpu", "cuda", "auto"],
+        choices=["cpu", "cuda", "mps", "auto"],
         default="auto",
         help="Device to run inference on",
     )
@@ -101,7 +101,17 @@ def select_device(arg: str) -> torch.device:
             return torch.device("cuda")
         print("CUDA requested but unavailable. Falling back to CPU.")
         return torch.device("cpu")
-    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if arg == "mps":
+        if torch.backends.mps.is_available():
+            return torch.device("mps")
+        print("MPS requested but unavailable. Falling back to CPU.")
+        return torch.device("cpu")
+    # auto: prefer CUDA > MPS > CPU
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    if torch.backends.mps.is_available():
+        return torch.device("mps")
+    return torch.device("cpu")
 
 
 @torch.no_grad()

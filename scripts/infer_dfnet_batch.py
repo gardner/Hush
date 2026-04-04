@@ -47,7 +47,7 @@ def parse_args() -> argparse.Namespace:
         "--input", type=Path, required=True, help="Input wav file or directory"
     )
     p.add_argument("--output-dir", type=Path, required=True, help="Output directory")
-    p.add_argument("--device", choices=["cpu", "cuda", "auto"], default="auto")
+    p.add_argument("--device", choices=["cpu", "cuda", "mps", "auto"], default="auto")
     p.add_argument("--atten-lim-db", type=float, default=None)
     p.add_argument("--no-delay-compensation", action="store_true")
     p.add_argument(
@@ -116,7 +116,17 @@ def select_device(arg: str) -> torch.device:
             return torch.device("cuda")
         print("CUDA requested but unavailable. Falling back to CPU.")
         return torch.device("cpu")
-    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if arg == "mps":
+        if torch.backends.mps.is_available():
+            return torch.device("mps")
+        print("MPS requested but unavailable. Falling back to CPU.")
+        return torch.device("cpu")
+    # auto: prefer CUDA > MPS > CPU
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    if torch.backends.mps.is_available():
+        return torch.device("mps")
+    return torch.device("cpu")
 
 
 def load_audio_mono(path: Path, target_sr: int) -> torch.Tensor:
